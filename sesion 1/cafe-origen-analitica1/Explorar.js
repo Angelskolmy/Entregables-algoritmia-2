@@ -2,19 +2,22 @@ import {
     prompts,
     productos, 
     Ciudades_Coverturas,
-    Db_ventas
+    Db_ventas, 
+    
 } from "./Db_datosDic.js" 
 
 
-function Alllist(){ 
+export function Alllist(){ 
 
-    console.table(
+    const Histoprial= Array.from( Db_ventas, ([RokId, Hardcontent])=> ({ 
 
-        Array.from(Db_ventas,([CipherKeys, infocontent])=>([
+        newIDVeta: RokId, 
 
-            CipherKeys, 
-            ...infocontent
+        ...Hardcontent
 
-        ]))
-    );
+    })
+    )
+   
+    console.table(Histoprial)
+   
 }

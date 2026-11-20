@@ -1,4 +1,6 @@
-export const prompts= require('prompt-sync')(); 
+import PromptSync from  "prompt-sync";
+
+export const prompts= PromptSync(); 
 
 export let productos = new Map([
 
@@ -32,7 +34,7 @@ export let Db_ventas= new Map([
        Ciudad:"Medellín", 
        Cantidad:2, 
        montoVenta:42000, 
-       PrecioXunidad:18.000 
+       PrecioXunidad:18000 
     }],
 
 
@@ -42,7 +44,7 @@ export let Db_ventas= new Map([
        Ciudad:"Bogotá", 
        Cantidad:1, 
        montoVenta: 26000, 
-       PrecioXunidad:13.000
+       PrecioXunidad:13000
     }],
     
     [3,{FechaVenta:"2026-09-02", 
@@ -51,7 +53,7 @@ export let Db_ventas= new Map([
         Ciudad:"Cali", 
         Cantidad:1, 
         montoVenta:95000, 
-        PrecioXunidad:95.000
+        PrecioXunidad:95000
     }],
     
     [4,{FechaVenta:"2026-09-02", 
@@ -60,7 +62,7 @@ export let Db_ventas= new Map([
         Ciudad:"Medellín", 
         Cantidad:1, 
         montoVenta:42000, 
-        PrecioXunidad:18.000
+        PrecioXunidad:18000
 
     }],
     
@@ -70,7 +72,7 @@ export let Db_ventas= new Map([
         Ciudad:"Medellín", 
         Cantidad:3 , 
         montoVenta:45000, 
-        PrecioXunidad:18.000
+        PrecioXunidad:18000
 
     }],
     
@@ -80,7 +82,7 @@ export let Db_ventas= new Map([
         Ciudad:"Bogotá", 
         Cantidad:2, 
         montoVenta:26000 , 
-        PrecioXunidad:13.000
+        PrecioXunidad:13000
 
     }],
     
@@ -90,7 +92,7 @@ export let Db_ventas= new Map([
         Ciudad:"Bogotá", 
         Cantidad:1,
          montoVenta:120000, 
-         PrecioXunidad:120.000
+         PrecioXunidad:120000
 
     }], 
 
@@ -100,7 +102,7 @@ export let Db_ventas= new Map([
         Ciudad:"Cali", 
         Cantidad:2, 
         montoVenta:42000, 
-        PrecioXunidad:18.000
+        PrecioXunidad:18000
 
     }],
     
@@ -110,7 +112,7 @@ export let Db_ventas= new Map([
         Ciudad:"Cali", 
         Cantidad:2, 
         montoVenta:45000, 
-        PrecioXunidad:18.000
+        PrecioXunidad:18000
 
     }],
     
@@ -120,7 +122,7 @@ export let Db_ventas= new Map([
         Ciudad:"Pereira", 
         Cantidad:4, 
         montoVenta:42000, 
-        PrecioXunidad:18.000
+        PrecioXunidad:18000
 
     }],
     
@@ -130,7 +132,7 @@ export let Db_ventas= new Map([
         Ciudad:"Medellín", 
         Cantidad:1, 
         montoVenta:95000, 
-        PrecioXunidad:95.000
+        PrecioXunidad:95000
 
     }],
     
@@ -140,7 +142,7 @@ export let Db_ventas= new Map([
         Ciudad:"Bogotá", 
         Cantidad:3, 
         montoVenta:26000, 
-        PrecioXunidad:13.000
+        PrecioXunidad:13000
 
     }]
 
@@ -155,11 +157,11 @@ function generadorDates(){
         InitRangoDate.getTime()+ Math.random()*(EndrangeDate.getTime() - InitRangoDate.getTime())
     ) 
 
-    return finaldate
+    return finaldate.toISOString().slice(0, 10);
 
 }
 
-function Ingreso_Manual(){ 
+export function Ingreso_Manual(){ 
  
     let Cantingreso
     while(true){  
@@ -177,11 +179,11 @@ function Ingreso_Manual(){
 
     } 
 
-    for(let bucladorIng = 0; bucladorIng<= Cantingreso; bucladorIng++){  
+    for(let bucladorIng = 0; bucladorIng< Cantingreso; bucladorIng++){  
 
         let lasid
-        for(const indicelast in Db_ventas){ 
-            lasid= indicelast 
+        for(const [contenId , contenOG] of Db_ventas.entries()){ 
+            lasid= contenId
         }  
 
         let newIDVeta= lasid + 1
@@ -201,7 +203,7 @@ function Ingreso_Manual(){
 
         } 
 
-        let idCleinte2= "C"+idCLiennte1; 
+        let idCleinte2= "C"+ String(idCLiennte1).padStart(2,"0"); 
 
         let fechaVenta= generadorDates()    
 
@@ -209,9 +211,9 @@ function Ingreso_Manual(){
 
         for(let opcid of Ciudades_Coverturas){ 
 
-            cont+=1
+            cont1+=1
 
-            console.log("Opcion N° ",cont1,"- ",Ciudades_Coverturas[opcid])
+            console.log("Opcion N° ",cont1,"- ",opcid)
 
         } 
 
@@ -237,14 +239,14 @@ function Ingreso_Manual(){
         } 
 
         let contadorProd=0
-        for( let listProd of productos){  
+        for( let [distintivo, inerlock] of productos.entries()){  
             contadorProd+=1
-            console.log("N°-",contadorProd," ", productos[listProd].nombre)
+            console.log("N°-",contadorProd," ", inerlock.nombre)
         } 
 
         let ProductoDeseado1= Number(prompts("ingrese el numero de producto deseado "))
 
-        while (ProductoDeseado1<=0 || !Number.isNaN(ProductoDeseado1) || ProductoDeseado1>5){  
+        while (ProductoDeseado1<=0 || !Number.isInteger(ProductoDeseado1) || ProductoDeseado1>5){  
             console.log("opcion invalida")
             ProductoDeseado1= Number(prompts("ingrese el numero de producto deseado "))
         }   
@@ -270,12 +272,13 @@ function Ingreso_Manual(){
         let productName 
         let precioProd 
 
-        for(let[indice,contenido] of cantidadXprod.entries()){ 
+        for(let[indice,contenido] of productos.entries()){ 
 
-            if(productos[indice] === ProdBusq ){
+            if(indice === ProdBusq ){
 
                 productName= contenido.nombre 
-                precioProd= contenido.valor
+                precioProd= contenido.valor 
+                break
             }
         } 
 
@@ -285,7 +288,7 @@ function Ingreso_Manual(){
 
             cantidadXprod= Number(prompts("ingrese cantidad del produto ")) 
 
-            if(cantidadXprod<=0 || !Number.isNaN(cantidadXprod)){
+            if(cantidadXprod<=0 || !Number.isInteger(cantidadXprod)){
                 console.log("ingreso invalido solo enteros mayores a 0") 
                 continue
             } 
@@ -309,7 +312,7 @@ function Ingreso_Manual(){
 
 } 
 
-function Ingreso_Automatico(){ 
+export function Ingreso_Automatico(){ 
     
     let VarBulceVent 
 
@@ -317,7 +320,7 @@ function Ingreso_Automatico(){
 
         VarBulceVent= Number(prompts("ingrese N de ingresos de deseados ")) 
 
-        if (VarBulceVent<=0 || !Number.isNaN(VarBulceVent)){ 
+        if (VarBulceVent<=0 || !Number.isInteger(VarBulceVent)){ 
             console.log("Ingreso invalido solo enteros mayores a 0") 
             continue
         } 
@@ -325,12 +328,12 @@ function Ingreso_Automatico(){
         break
     } 
 
-    for( let Anacronic = 0; Anacronic<= VarBulceVent; Anacronic++){ 
+    for( let Anacronic = 0; Anacronic< VarBulceVent; Anacronic++){ 
 
 
         let Ankalagon
-        for(let Ragakir in Db_ventas){ 
-            Ankalagon= Ragakir
+        for(const[id33,contei33] of Db_ventas.entries()){ 
+            Ankalagon= id33
         } 
 
         let Idventa= Ankalagon + 1 
@@ -345,7 +348,7 @@ function Ingreso_Automatico(){
             Math.floor(Math.random()* Ciudades_Coverturas.length)
         ] 
 
-        let ranDKey = Array.from(productos.key())[
+        let ranDKey = Array.from(productos.keys())[
             Math.floor(Math.random()*productos.size)
         ] 
 
@@ -354,7 +357,7 @@ function Ingreso_Automatico(){
         
         for(let[cipher,treasure] of productos.entries()){
 
-            if(productos[cipher] == ranDKey){ 
+            if(cipher == ranDKey){ 
 
                 interior= treasure.nombre 
                 landa= treasure.valor
