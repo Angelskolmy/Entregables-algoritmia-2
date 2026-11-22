@@ -24,7 +24,8 @@ import{GananciasTotales,
        MaPTotalVentasXciudad, 
        unidadesPorProducto, 
        sortlog,
-       OrderFecha
+       OrderFecha,
+       PrimeraVenta
 } from "./cafe-origen-analitica1/Analitica.js" 
 
 import{ 
@@ -37,7 +38,13 @@ import{
 
 import{ 
     ReportSol
-} from "./cafe-origen-analitica1/Reportes.js"
+} from "./cafe-origen-analitica1/Reportes.js" 
+
+import { 
+MetricaTotalVendido, 
+MetricaVentaMayor,
+MetricaTotalPorciudad
+} from './cafe-origen-analitica1/Metricas.js';
 
 while(true){ 
 
@@ -65,7 +72,13 @@ while(true){
 
         .11- Reporte 
 
-        .12- Venta por fecha
+        .12- Venta por fecha 
+
+        .13 comparacion Big o funciones instrumentalisadas 
+
+        .14 Primera venta Funcion 0(N) 
+
+        .0 Salir del Motor
         `)
 
     let varAgis
@@ -73,7 +86,7 @@ while(true){
 
         varAgis= Number(prompts("ingrese numero de opcion deseado ")) 
 
-        if(varAgis <0 || !Number.isInteger(varAgis) || varAgis>12){ 
+        if(varAgis <0 || !Number.isInteger(varAgis) || varAgis>14){ 
             console.log("dato invalido opcion no exite")
             continue
         } 
@@ -166,7 +179,9 @@ while(true){
         }
         else if(opcionINg4 == 2){ 
             MaPTotalVentasXciudad()
-        }
+        } 
+
+        continue
     }
 
     else if(varAgis == 8){ 
@@ -208,6 +223,38 @@ while(true){
 
     else if(varAgis == 12){ 
         OrderFecha()
+        continue
+    } 
+
+    else if(varAgis == 13){ 
+       
+        let opcionINg5= Number(prompts("que metricas big(0) desea ver 1.TotalVentas 2.TotalItems 3.VentasxCiudad  "))
+
+        while(opcionINg5 !== 1 && opcionINg5 !== 2 && opcionINg5!== 3){ 
+            console.log("numero de opcion invalido o inexistente") 
+            opcionINg5= Number(prompts("que metricas big(0) desea ver 1.TotalVendido 2.MayorVenta 3.VentasxCiudad  "))
+        }  
+
+        if(opcionINg5 == 1){
+            let Result1= MetricaTotalVendido() 
+            console.log(Result1)
+        } 
+
+        else if(opcionINg5 == 2){ 
+           let Result2= MetricaVentaMayor() 
+           console.log(Result2)
+        } 
+
+        else if(opcionINg5 == 3){ 
+           let Result3= MetricaTotalPorciudad() 
+           console.log(Result3)
+        }
+
+        continue
+    } 
+
+    else if(varAgis == 14){ 
+        PrimeraVenta()
         continue
     }
     

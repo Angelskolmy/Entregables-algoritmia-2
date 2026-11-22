@@ -39,7 +39,7 @@ export function MapGananciasTotales(){
         return Alque + max.Cantidad;
     },0) 
 
-    rolok2= [{Estad: "Ganacias totales", Cantidad_itemVendidos: cantToTProds, Promedio_ganaciaXventa: ToGOal}]
+    rolok2= [{Estad: "Ganacias totales", Cantidad_itemVendidos: cantToTProds, Promedio_ganacia: ToGOal}]
 
     console.table(rolok2) 
 
@@ -389,6 +389,7 @@ export function sortingForreport(){
 
         console.table(orderyulok.slice(0,3))
 } 
+
 export function OrderFecha (){ 
 
 
@@ -410,6 +411,27 @@ export function OrderFecha (){
     
 
     console.table(lors)
+
+
+} 
+
+export function PrimeraVenta(){ 
+
+    let Vult= Array.from(Db_ventas.values()) 
+
+    let PrimeraVenta= Vult.filter((sail,cords) => cords === 0) 
+
+    let result= {
+        FechaVenta: PrimeraVenta[0].FechaVenta, 
+        IdCliente: PrimeraVenta[0].IdCliente, 
+        Producto: PrimeraVenta[0].Producto, 
+        Ciudad: PrimeraVenta[0].Ciudad,
+        Cantidad: PrimeraVenta[0].Cantidad, 
+        montoVenta: PrimeraVenta[0].montoVenta, 
+        PrecioXunidad: PrimeraVenta[0].PrecioXunidad,
+    }
+
+    console.table(result)
 
 
 }

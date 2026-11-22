@@ -29,7 +29,7 @@ export function comparador_TotalVendido(){
     let CicleVersion = GananciasTotales() 
     let MapVersion= MapGananciasTotales() 
 
-    if(CicleVersion[0].Monto == MapVersion[0].Promedio_ganaciaXventa){ 
+    if(CicleVersion[0].Monto == MapVersion[0].Promedio_ganacia){ 
 
         console.log("Mismo monto de ganancias totales calculado  en 2 versiones")
         console.log("OK")
@@ -77,7 +77,7 @@ export function comparador_VentForcity(){
         );
 
 
-    if(CicleVersion){ 
+    if(condicional){ 
 
         console.log("Misma cantidad de ganancias por ciuidad calculado calculado  en 2 versiones")
         console.log("OK")

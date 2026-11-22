@@ -253,4 +253,76 @@ La versión actual sí contiene datos de 12 ventas, consultas con ciclos y méto
 - El reporte actual no muestra un resumen diario con y sin ventas.
 - La suma actual de `montoVenta` es $646.000, no los $985.000 del criterio de aceptación; revisar la muestra antes de afirmar cumplimiento.
 
-No se declara aquí que los requisitos pendientes estén implementados, ni que se haya realizado un commit o push.
+No se declara aquí que los requisitos pendientes estén implementados, ni que se haya realizado un commit o push. 
+
+
+## MiniReto 5: Predicciones, mediciones y clasificación Big O
+
+**Regla de conteo:** se suma 1 por cada iteración de un ciclo. La comparación que
+se evalúa en cada iteración no se cuenta aparte, porque siempre ocurre con ella.
+No se cuentan sumas, asignaciones, contadores dentro de un `if` ni el incremento
+del propio contador. Las constantes no cambian la clasificación Big O, solo el
+número que aparece en la tabla.
+
+**Definición de n:** n es la cantidad de ventas que hay en `Db_ventas` al medir:
+las 12 del Día 1 más las generadas. Por eso los valores reales son 112, 1.012,
+10.012 y 100.012. Cada medición se hizo reiniciando el programa, sin acumular
+datos entre corridas.
+
+**Nota sobre los datos:** la cantidad por venta se genera entre 1 y 99 (no entre
+1 y 5) para que los montos no queden cíclicos en la venta mayor. Con 5 productos
+y 4 precios distintos, el monto máximo igual puede repetirse con n grande.
+
+### Predicción (escrita antes de medir)
+
+| Función | Operaciones esperadas | Si n × 10 |
+|---|---|---|
+| totalVendido | n | × 10 |
+| ventaMayor | n | × 10 |
+| totalPorCiudad | 4n + 4 | × 10 aprox. |
+| primeraVenta | constante | no crece |
+
+### Justificación con el código
+- **totalVendido:** un solo ciclo que visita cada venta una vez para sumar su
+  monto. Operaciones = n.
+- **ventaMayor:** un solo ciclo; la comparación con el máximo ocurre en cada
+  vuelta y no se cuenta aparte. Operaciones = n.
+- **totalPorCiudad:** dos ciclos anidados. El externo recorre las 4 ciudades
+  (constante) y el interno recorre las n ventas. Total 4n + 4; se eliminan
+  constantes y términos menores.
+
+### Resultados medidos (formato: medido (esperado))
+
+| n real | totalVendido | ventaMayor | totalPorCiudad |
+|---:|---:|---:|---:|
+| 112 | 112 (112) | 122 (112) | 452 (452) |
+| 1.012 | 1.012 (1.012) | 1.017 (1.012) | 4.052 (4.052) |
+| 10.012 | 10.012 (10.012) | 10.020 (10.012) | 40.052 (40.052) |
+| 100.012 | 100.012 (100.012) | 100.025 (100.012) | 400.052 (400.052) |
+
+Crecimiento al multiplicar n por 10:
+
+| Función | 1.er paso | 2.º paso | 3.er paso |
+|---|---:|---:|---:|
+| totalVendido | × 9,04 | × 9,89 | × 9,99 |
+| ventaMayor | × 8,34 | × 9,85 | × 9,98 |
+| totalPorCiudad | × 8,96 | × 9,89 | × 9,99 |
+
+### Comparación con la predicción
+- **totalVendido:** coincide exacto con n.
+- **totalPorCiudad:** coincide exacto con 4n + 4.
+- **ventaMayor:** no coincide. Marcó n + k con k = 10, 5, 8 y 13. Causa: el
+  contador dentro del `if` suma 1 cada vez que se reemplaza el máximo, lo que va
+  contra la regla de contar solo iteraciones. k depende del orden aleatorio de
+  los datos y por eso varía entre corridas.
+- El primer salto da cerca de × 9 y no × 10 porque cada n incluye 12 ventas base.
+  A medida que n crece, el factor se acerca a × 10.
+
+### Clasificación Big O
+- **totalVendido: O(n).** Un ciclo, una visita por venta; medido n exacto.
+- **ventaMayor: O(n).** Un ciclo con la comparación en cada vuelta; medido n + k,
+  con k pequeño que crece muy despacio. El desvío no cambia la clasificación.
+- **totalPorCiudad: O(n).** Ciclo externo de 4 ciudades (O(1)) y ciclo interno de
+  n ventas (O(n)); medido 4n + 4. No es O(n²) porque el ciclo externo no crece
+  con n.
+- **primeraVenta: O(1).** Pendiente de medir; debe mantenerse constante al crecer n.

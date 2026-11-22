@@ -314,33 +314,55 @@ export function Ingreso_Manual(){
 
 export function Ingreso_Automatico(){ 
     
-    let VarBulceVent 
+    console.log(` 
+        
+        Cuantos registros generara: 
+
+        1- 100 
+
+        2- 1000 
+
+        3- 10000 
+
+        4- 100000
+
+        `)
+
+    let VarBulceVent  
+    let cantgTao
 
     while (true){ 
 
-        VarBulceVent= Number(prompts("ingrese N de ingresos de deseados ")) 
+        VarBulceVent= Number(prompts("seleccione N de opcion de cantidad de registros a añadir ")) 
 
-        if (VarBulceVent<=0 || !Number.isInteger(VarBulceVent)){ 
-            console.log("Ingreso invalido solo enteros mayores a 0") 
+        if (VarBulceVent<=0 || VarBulceVent>4 || !Number.isInteger(VarBulceVent)){ 
+            console.log("Ingreso invalido solo enteros mayores a 0 hasta 4") 
             continue
         } 
 
         break
+    }  
+
+    if(VarBulceVent == 1){ 
+        cantgTao = 100
     } 
+    else if(VarBulceVent == 2){
+        cantgTao = 1000
+    }
+    else if(VarBulceVent == 3){
+        cantgTao = 10000
+    }
+    else if(VarBulceVent == 4){
+        cantgTao = 100000
+    }
 
-    for( let Anacronic = 0; Anacronic< VarBulceVent; Anacronic++){ 
+    for( let Anacronic = 0; Anacronic< cantgTao; Anacronic++){ 
 
-
-        let Ankalagon
-        for(const[id33,contei33] of Db_ventas.entries()){ 
-            Ankalagon= id33
-        } 
-
-        let Idventa= Ankalagon + 1 
+        let Idventa= Db_ventas.size + 1 
 
         let fechaVenta2= generadorDates() 
 
-        let NumericPart= Math.floor(Math.random()*99)+1; 
+        let NumericPart= Math.floor(Math.random() * Math.max(1, Math.floor(cantgTao/3)))+1; 
         let Previspart= String(NumericPart).padStart(2,"0") 
         let IdCliente="C" + Previspart 
 
