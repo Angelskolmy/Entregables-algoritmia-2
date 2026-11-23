@@ -24,7 +24,7 @@ export let productos = new Map([
     valor: 120000 }]
 ]); 
 
-export let Ciudades_Coverturas= ['Medellín','Bogotá','Cali','Pereira']
+export let Ciudades_Coverturas= ['Medellín','Bogotá','Cali','Pereira'] 
 
 export let Db_ventas= new Map([
 

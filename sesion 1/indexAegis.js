@@ -25,7 +25,10 @@ import{GananciasTotales,
        unidadesPorProducto, 
        sortlog,
        OrderFecha,
-       PrimeraVenta
+       PrimeraVenta,
+       ClientesDuplicados,
+       FuncionSinProposito, 
+       totalVenta1Cicle
 } from "./cafe-origen-analitica1/Analitica.js" 
 
 import{ 
@@ -76,7 +79,13 @@ while(true){
 
         .13 comparacion Big o funciones instrumentalisadas 
 
-        .14 Primera venta Funcion 0(N) 
+        .14 Primera venta Funcion 0(N)  
+
+        .15 funcion Comparativa 
+
+        .16 venta x ciudad cadena 
+
+        .17 totalVentas 1 ciudad
 
         .0 Salir del Motor
         `)
@@ -86,7 +95,7 @@ while(true){
 
         varAgis= Number(prompts("ingrese numero de opcion deseado ")) 
 
-        if(varAgis <0 || !Number.isInteger(varAgis) || varAgis>14){ 
+        if(varAgis <0 || !Number.isInteger(varAgis) || varAgis>17){ 
             console.log("dato invalido opcion no exite")
             continue
         } 
@@ -255,6 +264,21 @@ while(true){
 
     else if(varAgis == 14){ 
         PrimeraVenta()
+        continue
+    } 
+
+    else if(varAgis == 15){ 
+        ClientesDuplicados()
+        continue
+    } 
+
+    else if(varAgis == 16){ 
+        FuncionSinProposito()
+        continue
+    } 
+
+    else if(varAgis == 17){ 
+        totalVenta1Cicle()
         continue
     }
     

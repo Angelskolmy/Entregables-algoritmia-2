@@ -2,7 +2,7 @@ import {
     prompts,
     productos, 
     Ciudades_Coverturas,
-    Db_ventas
+    Db_ventas, 
 } from "./Db_datosDic.js"  
 
 
@@ -438,3 +438,219 @@ export function PrimeraVenta(){
 
 
 
+export function ClientesDuplicados(){   
+
+    console.time("Filter") 
+
+    let sintId= RandomId()
+
+    let DictResultReal= new Map() 
+    let ClientesRepetidos= new Map()
+
+    let MaterialBase= Array.from(Db_ventas.values()) 
+
+    let SezgoInder= Object.groupBy(MaterialBase, MaterialBase=> MaterialBase.IdCliente) 
+
+    for (let[contraseña, tesoro] of Object.entries(SezgoInder)){  
+
+        let idReport44= RandomId() 
+
+        if (tesoro.length>1){
+
+            ClientesRepetidos.set(idReport44,{ 
+
+                id: contraseña
+
+            })
+
+        }
+
+    }  
+
+
+    for (let[Keter, Euclid] of  ClientesRepetidos.entries()){ 
+
+        let filtraciones = MaterialBase.filter(shuvnigurat => shuvnigurat.IdCliente == Euclid.id) 
+
+        let Cantidad= filtraciones.length 
+
+        DictResultReal.set(Keter,{ 
+
+            IdCliente: Euclid.id,
+            Cantidad_Ventas_Asociadas: Cantidad,
+
+        })
+    }
+
+    let imop= Array.from(DictResultReal, ([LLave, cipher]) => ({ 
+
+        ClaveRegistro: LLave, 
+        ...cipher
+
+    })) 
+
+    console.table(imop)
+
+    console.timeEnd("Filter")
+
+} 
+
+export function FuncionSinProposito(){   
+
+    let matrizResuklt= new Map() 
+
+    let firstConter=0 
+
+    let ALetsCLav= RandomId()
+
+    let matrialBas22= Array.from(Db_ventas.values()) 
+
+    let clonicas= matrialBas22.map(ciudadNorm =>({ 
+        ...ciudadNorm, 
+
+        Ciudad: ciudadNorm.Ciudad.trim().toUpperCase()
+    })) 
+
+    for (let Zelda of Ciudades_Coverturas){   
+
+        firstConter+=1
+
+        console.log("N°- ",firstConter," ", Zelda)
+
+    }  
+
+    let ingresoOpCiudad
+
+    while(true){
+        ingresoOpCiudad= Number(prompts("ingrese ciudad a filtrar ")) 
+
+        if (ingresoOpCiudad <=0 || !Number.isInteger(ingresoOpCiudad)){ 
+            console.log("opcion inexsitente") 
+            continue
+        } 
+
+        break
+    } 
+
+    let ciudadDeseada
+
+    if(ingresoOpCiudad == 1){
+        ciudadDeseada= "MEDELLÍN"
+    } 
+    else if(ingresoOpCiudad == 2){ 
+        ciudadDeseada= "BOGOTÁ"
+    } 
+    else if(ingresoOpCiudad == 3){ 
+        ciudadDeseada= "CALI"
+    }
+    else if(ingresoOpCiudad ==4){ 
+        ciudadDeseada= "PEREIRA"
+    } 
+
+
+    let juzagarHist= clonicas.filter(clonicas => clonicas.Ciudad == ciudadDeseada)  
+
+    let CantVentas= juzagarHist.length
+
+    let TotalCiudad= juzagarHist.reduce((Biz,Muto)=>{
+
+        return Biz+ Muto.montoVenta
+    },0) 
+
+    matrizResuklt.set(ALetsCLav,{ 
+        Ciudad:juzagarHist[0].Ciudad, 
+        GananciaSTotales:TotalCiudad, 
+        Total_Ventas_Asociadas:CantVentas
+    }) 
+
+    let conversorPrintnes= Array.from(matrizResuklt,([Godwin, radan]) => ({ 
+
+        NumeroRegistro:Godwin, 
+        ...radan
+    })) 
+
+    console.table(conversorPrintnes)
+
+} 
+
+export function totalVenta1Cicle(){  
+
+    let reportRay= new Map()
+
+    console.log(` 
+        
+        seleccione numero de ciudad deseada  
+        
+        1-Medellin  
+        2-Bogota
+        3-Cali
+        4-Pereira
+        
+        
+    `) 
+
+    let oprTVci 
+
+    while(true){ 
+
+        oprTVci= Number(prompts("ingrese opcion deseada ")) 
+
+        if(oprTVci<=0 || oprTVci>4 || !Number.isInteger(oprTVci)){ 
+            console.log("opcion inexitente ") 
+            continue
+        } 
+
+        break
+
+    } 
+
+    let relacomp
+
+    if(oprTVci == 1){
+
+        relacomp= Ciudades_Coverturas[0]
+    }
+    else if(oprTVci == 2){
+        relacomp= Ciudades_Coverturas[1]
+    } 
+    else if(oprTVci == 3){
+        relacomp= Ciudades_Coverturas[2]
+    }
+    else if(oprTVci == 4){
+        relacomp= Ciudades_Coverturas[3]
+    } 
+
+    let conterro1= 0 
+    let conterrot2=0
+    let IdRelalog
+
+    for(let [yumi, yunara] of Db_ventas.entries()){ 
+
+        if(yunara.Ciudad == relacomp){
+
+            conterro1+=yunara.montoVenta 
+            conterrot2+=yunara.Cantidad 
+            IdRelalog= yumi
+
+        } 
+
+    }  
+
+
+    reportRay.set(IdRelalog,{ 
+
+        GananciasTotales:conterro1, 
+        VentasAsociadas: conterrot2
+
+    }) 
+
+    let rtles= Array.from(reportRay,([volibear, hornn]) => ({ 
+
+        idRegistes:volibear,
+        ...hornn
+
+    })) 
+
+    console.table(rtles)
+
+}
