@@ -326,3 +326,297 @@ Crecimiento al multiplicar n por 10:
   n ventas (O(n)); medido 4n + 4. No es O(n²) porque el ciclo externo no crece
   con n.
 - **primeraVenta: O(1).** Pendiente de medir; debe mantenerse constante al crecer n.
+
+### primeraVenta (versión con Array.from + filter por índice)
+
+**Predicción y justificación con el código:** `Array.from` copia las n ventas a
+un arreglo (n visitas) y `filter` ejecuta su función una vez por cada elemento
+(n visitas más). Después solo se lee la posición 0. Con la regla de conteo
+(1 por iteración) son ≈ 2n operaciones, y la copia ocupa memoria proporcional a n.
+
+| n real | operaciones esperadas (≈ 2n, por código, sin medir con contador) |
+|---:|---:|
+| 112 | 224 |
+| 1.012 | 2.024 |
+| 10.012 | 20.024 |
+| 100.012 | 200.024 |
+
+**Observación:** con 100.012 registros la función respondió en menos de 2
+segundos. El tiempo percibido no determina la clasificación: Big O mide cómo
+crece el número de operaciones, no cuánto tarda hoy.
+
+### Comparación de las cuatro funciones
+
+| Función | Operaciones | Si n × 10 | Clasificación |
+|---|---|---|---|
+| totalVendido | n (medido) | × 10 | O(n) |
+| ventaMayor | n + k (medido) | × 10 | O(n) |
+| totalPorCiudad | 4n + 4 (medido) | × 10 | O(n) |
+| primeraVenta | ≈ 2n (por código) | × 10 | O(n) |
+
+Las cuatro funciones crecen en proporción a n. En esta versión del motor no hay
+una función de costo constante que sirva de contraste.
+
+### Clasificación Big O de primeraVenta
+**O(n) en tiempo y O(n) en memoria.** Justificación: dos recorridos completos
+(`Array.from` y `filter`) y un arreglo intermedio de n elementos. Solo la lectura
+final de la posición 0 es O(1), pero el resto de la función domina el costo.
+
+### Desviación respecto al enunciado
+El MiniReto 5 pide una función de complejidad constante para contrastar con las
+lineales (por ejemplo, `primeraVenta` con acceso directo al primer elemento). Se
+decidió mantener la versión actual, que devuelve la venta correcta pero es O(n).
+Por eso la comparación no incluye un caso O(1). Una versión de acceso directo
+(sin copiar ni filtrar la colección) sería O(1) y cubriría ese punto.
+
+## MiniReto 6: Traza y complejidad de `ClientesDuplicados`
+
+### Qué se cuenta
+
+La función primero convierte las ventas a un arreglo y las agrupa por `IdCliente`
+con `Object.groupBy`. Para cada cliente repetido, vuelve a recorrer todo
+`MaterialBase` con `filter` para contar sus ventas. La parte costosa es esa
+repetición del recorrido completo.
+
+En la traza cuento las comparaciones explícitas de igualdad dentro del callback
+de `filter` (`venta.IdCliente == Euclid.id`). No cuento las operaciones internas
+de `Object.groupBy`, porque no están escritas como comparaciones en el código de
+la función.
+
+### Traza manual con 5 ventas
+
+Entrada de ejemplo:
+
+| Venta | `IdCliente` |
+|---:|---|
+| 1 | C01 |
+| 2 | C02 |
+| 3 | C01 |
+| 4 | C03 |
+| 5 | C02 |
+
+`Object.groupBy` produce tres grupos: C01 (ventas 1 y 3), C02 (ventas 2 y 5) y
+C03 (venta 4). Solo C01 y C02 cumplen `tesoro.length > 1`, así que se ejecuta un
+`filter` completo para cada uno:
+
+| Venta recorrida | Comparación con C01 | Comparación con C02 |
+|---:|---|---|
+| 1 (C01) | C01 == C01: sí | C01 == C02: no |
+| 2 (C02) | C02 == C01: no | C02 == C02: sí |
+| 3 (C01) | C01 == C01: sí | C01 == C02: no |
+| 4 (C03) | C03 == C01: no | C03 == C02: no |
+| 5 (C02) | C02 == C01: no | C02 == C02: sí |
+| **Comparaciones del `filter`** | **5** | **5** |
+
+Resultado: el filtro compara 5 ventas para C01 y otras 5 para C02: **10
+comparaciones de `IdCliente`**. Además, el ciclo de grupos evalúa tres veces
+`tesoro.length > 1` (una por cada grupo). Si se cuentan también esas pruebas, son
+13 comparaciones explícitas en este ejemplo, sin contar trabajo interno de
+`Object.groupBy`.
+
+### Generalización
+
+Sea `n` el número de ventas, `g` el número de clientes distintos y `d` el número
+de clientes con más de una venta. El `filter` examina las `n` ventas una vez por
+cada cliente repetido, por lo que realiza `n × d` comparaciones de IDs. Sumando
+la condición `tesoro.length > 1`, hay además `g` pruebas:
+
+```text
+comparaciones explícitas = n × d + g
+```
+
+En el peor caso, `d` crece proporcionalmente a `n` (por ejemplo, muchos clientes
+con dos ventas cada uno). Entonces el término dominante es cuadrático:
+**O(n²)**. Si no hay clientes repetidos, `d = 0` y no se ejecutan los filtros
+internos; el trabajo restante es lineal.
+
+### Costo oculto de `recurrentes.includes`
+
+`Array.includes` no consulta una tabla de acceso constante: busca el elemento
+recorriendo el arreglo y, si no lo encuentra, puede revisar todos sus elementos.
+Una llamada sobre un arreglo de longitud `r` cuesta hasta O(r).
+
+Si `recurrentes.includes(...)` se ejecuta dentro de un ciclo de `n` ventas y el
+arreglo `recurrentes` puede crecer hasta tener O(n) elementos, el costo acumulado
+en el peor caso es O(n²). Por ejemplo, si en cada vuelta se busca un valor que no
+está en el arreglo y su longitud aumenta, el total de elementos examinados puede
+ser `0 + 1 + 2 + ... + (n - 1)`, que equivale a `n(n - 1) / 2`. Si `includes`
+se llama una sola vez, o si el arreglo tiene un tamaño máximo constante, este
+costo no produce por sí solo un ciclo cuadrático.
+
+**Nota sobre el código revisado:** la versión actual de `ClientesDuplicados` en
+`Analitica.js` no contiene `recurrentes.includes`; su costo cuadrático ya se
+explica por los filtros repetidos de `MaterialBase`. Por tanto, el análisis de
+`includes` describe el costo que tendría si esa búsqueda aparece en otra versión
+o en otro ciclo; no se suma como operación observada en esta versión.
+
+### Mediciones controladas
+
+Se midió `ClientesDuplicados()` en Node.js 22.18.0 con exactamente `n` ventas
+sintéticas en `Db_ventas`, asignando dos ventas a cada ID de cliente. Los datos se
+prepararon antes de iniciar el temporizador. Se mantuvieron los
+`console.time("Filter")` y `console.timeEnd("Filter")` de la función, y se
+silenció `console.table` durante estas pruebas para que el renderizado de miles
+de filas no dominara la medición. Cada tamaño se cargó por separado en el mismo
+proceso aislado; estos datos no se guardaron en el proyecto.
+
+| Ventas (`n`) | Tiempo medido |
+|---:|---:|
+| 1.000 | 9,960 ms |
+| 2.000 | 22,982 ms |
+| 4.000 | 79,302 ms |
+| 8.000 | 244,770 ms |
+| 16.000 | 678,720 ms |
+
+Al duplicar `n`, los factores observados fueron aproximadamente ×2,31, ×3,45,
+×3,09 y ×2,77. No dan exactamente ×4: los tiempos pequeños varían por
+calentamiento del motor, planificación del sistema y otros costos fijos. El
+conteo de operaciones explica el crecimiento cuadrático; el cronómetro es una
+medición de una sola ejecución, no una prueba exacta de la complejidad.
+
+Con el patrón de dos ventas por cliente, hay aproximadamente `d = n/2` clientes
+repetidos; por tanto, el filtro realiza `n²/2` comparaciones de IDs:
+
+| `n` | Comparaciones de ID estimadas (`n²/2`) |
+|---:|---:|
+| 1.000 | 500.000 |
+| 2.000 | 2.000.000 |
+| 4.000 | 8.000.000 |
+| 8.000 | 32.000.000 |
+| 16.000 | 128.000.000 |
+
+### Estimaciones para tamaños mayores
+
+Extrapolando desde 16.000 con crecimiento cuadrático:
+
+```text
+tiempo(100.000) ≈ 678,720 ms × (100.000 / 16.000)² ≈ 26,51 s
+tiempo(1.000.000) ≈ 678,720 ms × (1.000.000 / 16.000)² ≈ 44 min 11 s
+```
+
+El archivo de consola compartido `pruebas 100000.txt` registra `Filter:
+39.561s` para la prueba de 100.000. Esa medición completa, que incluye la
+impresión de la tabla, es menor que el límite de dos minutos; por eso cumple el
+criterio para ejecutar 100.000. No se repitió esa ejecución. Usando ese tiempo
+observado como referencia, una extrapolación cuadrática a 1.000.000 es
+`39,561 s × 100 ≈ 65 min 56 s`. La diferencia frente a 44 min 11 s se debe a
+que la medición de consola incluye impresión y otras variaciones del entorno.
+No se ejecutó 1.000.000: la estimación supera ampliamente dos minutos.
+
+Los otros tiempos del archivo `pruebas1246816bigo.txt` no se asignan a los cinco
+tamaños solicitados, porque el registro contiene reinicios y varias selecciones
+de generación de datos y no deja inequívoco el tamaño exacto de cada medición.
+
+## Comparación de `totalPorCiudad`: ciclos y métodos encadenados
+
+Las dos versiones equivalentes son `TotalVentasXciudad()` y
+`MaPTotalVentasXciudad()` de `Analitica.js`. La primera usa un recorrido con
+`for` por cada ciudad y la segunda convierte `Db_ventas` a arreglo y encadena
+`filter` y `reduce`.
+
+### Prueba con 10.000 ventas
+
+Se realizó una prueba aislada por consola en Node.js 22.18.0 sin modificar el
+código del proyecto. Primero se vació `Db_ventas` y se agregaron exactamente
+10.000 ventas sintéticas. Los montos fueron `1, 2, 3, ..., 10000` y las cuatro
+ciudades se asignaron de forma rotatoria.
+
+La versión con ciclos hizo:
+
+```text
+Medellín: 12.497.500
+Bogotá:   12.500.000
+Cali:     12.502.500
+Pereira:  12.505.000
+```
+
+La versión de arreglo hizo exactamente los mismos totales. La comprobación
+directa en consola devolvió `iguales: true`. Ambas también tienen el mismo
+resultado esperado por sumas matemáticas:
+
+```text
+(1 + 5 + 9 + ... + 9997) = 12.497.500
+(2 + 6 + 10 + ... + 9998) = 12.500.000
+(3 + 7 + 11 + ... + 9999) = 12.502.500
+(4 + 8 + 12 + ... + 10000) = 12.505.000
+```
+
+### Recorridos y arreglos creados
+
+Sea `n` el número de ventas y `c = 4` el número fijo de ciudades.
+
+| Versión | Recorridos completos de datos | Arreglos nuevos | Tiempo | Espacio auxiliar |
+|---|---|---|---|---|
+| `TotalVentasXciudad` | 4 recorridos de `Db_ventas` | Ninguno para las ventas | O(cn) = O(n) | O(1), además del mapa de cuatro resultados |
+| `MaPTotalVentasXciudad` | 4 `Array.from`; 4 `filter`; 4 `reduce` | 4 copias de todas las ventas y hasta 4 arreglos filtrados, creados uno por ciudad | O(cn) = O(n) | O(n) durante los arreglos temporales |
+
+En la versión de métodos, `Array.from(Db_ventas.values())` recorre el `Map` una
+vez y crea un arreglo de `n` ventas. Después `filter` recorre ese arreglo y crea
+otro arreglo con las ventas de una ciudad. `reduce` recorre ese arreglo filtrado
+sin crear otro arreglo. Como el ciclo se repite cuatro veces, el flujo completo
+hace aproximadamente ocho recorridos completos de tamaño `n` (cuatro copias más
+cuatro filtros) y queda dominado por `n`.
+
+Aunque el recorrido con ciclos hace solamente una pasada por venta por cada
+ciudad y la cadena ejecuta varios recorridos, las cuatro operaciones no cambian
+la clasificación: `4n + constante` se simplifica eliminando la constante y el
+factor 4. Por eso las dos versiones son **O(n)** en tiempo.
+
+En cuanto al espacio, el recorrido con ciclos mantiene variables escalares y
+un resultado de tamaño constante para las cuatro ciudades: **O(1) auxiliar**.
+La versión encadenada puede mantener una copia de las `n` ventas y un arreglo
+filtrado de hasta `n` elementos; por tanto, su espacio auxiliar es **O(n)**.
+La cantidad de ciudades también puede considerarse fija en este proyecto.
+
+### Complejidad espacial de las funciones del motor
+
+Se clasificó la memoria adicional que construye cada función, sin contar
+`Db_ventas`, `productos` ni `Ciudades_Coverturas` como memoria creada por ella.
+
+| Función | Clasificación espacial | Justificación |
+|---|---|---|
+| `GananciasTotales` | O(1) | Solo acumulador y arreglo de salida pequeño. |
+| `MapGananciasTotales` | O(n) | `Array.from(Db_ventas.values())` crea un arreglo de todas las ventas. |
+| `TotalItemsBendidos` | O(1) | Solo acumula una cantidad en escalar. |
+| `MapTotalItemsBendidos` | O(n) | Crea un arreglo completo de ventas antes del `reduce`. |
+| `MayorVenta` | O(1) | Guarda solo la mejor venta encontrada. |
+| `PrecioPromedioVenta` | O(n) | Construye un `Map` y una salida con una fila por venta. |
+| `TotalVentasXciudad` | O(1) auxiliar | Solo escalares y una tabla resultado con las cuatro ciudades. |
+| `MaPTotalVentasXciudad` | O(n) | Guarda copias temporales y arreglos filtrados proporcionales a `n`. |
+| `unidadesPorProducto` | O(n) | Los filtros construyen arreglos por producto y la salida tiene datos proporcionales a los resultados; hay cinco productos fijos. |
+| `sortlog` / `sortingForreport` | O(n) | `structuredClone` y `Array.from` duplican las ventas; luego el arreglo ordenado usa memoria del tamaño de los productos. |
+| `OrderFecha` | O(n) | Agrupa todas las ventas y crea arreglos y una salida plana con tamaño proporcional a `n`. |
+| `PrimeraVenta` | O(n) | `Array.from` y `filter` crean o conservan datos proporcionales a `n`. |
+| `ClientesDuplicados` | O(n) | Los mapas, el arreglo base y los grupos contienen referencias proporcionales al número de ventas/clientes. |
+| `FuncionSinProposito` | O(n) | El `map` crea un arreglo normalizado y `filter` otro arreglo antes de reducir. |
+| `totalVenta1Cicle` | O(1) auxiliar | Solo acumula dos totales y una clave, además de guardar el reporte pequeño. |
+| `Alllist` | O(n) | Construye explícitamente un arreglo con todas las ventas. |
+
+`topProductosPorValor` corresponde en este proyecto a `sortlog()` y
+`sortingForreport()`: ambos hacen una copia profunda del `Map` y una copia a
+arreglo de las ventas. En el peor caso necesitan `n` posiciones para la copia
+del arreglo y para los grupos de trabajo, por lo que su complejidad espacial es
+**O(n)**. Además, `filter` dentro del ciclo de productos puede crear hasta n
+elementos por producto. Como el número de productos es constante en este motor,
+ese trabajo sigue siendo lineal y no pasa a O(n²).
+
+`totalPorCiudad` corresponde a `TotalVentasXciudad()` y
+`MaPTotalVentasXciudad()`. En el proyecto hay cuatro ciudades: `c` puede tratarse
+como constante, así que ambas tienen tiempo O(n). Sin embargo, difieren en
+memoria: la versión con ciclos usa memoria auxiliar constante y la versión
+encadenada usa memoria adicional proporcional a las ventas.
+
+### Decisión para `totalCiudad`
+
+La versión que se conservará como comparación legible es
+`MaPTotalVentasXciudad()` y la versión de menor consumo es
+`TotalVentasXciudad()`. Para este motor, se decide conservar el **uso con ciclos
+como implementación principal de `totalPorCiudad`**, porque ambas producen el
+mismo resultado y sus tiempos son O(n), pero la versión con ciclos evita copiar
+`n` ventas varias veces y usa memoria auxiliar O(1).
+
+La versión encadenada queda como comparación didáctica y alternativa de
+legibilidad: expresa claramente conversión, filtrado y reducción, y demuestra
+cómo varios recorridos constantes siguen siendo lineales. El criterio de
+decisión no cambia código en esta redacción: no se realiza el cambio hasta
+confirmar la ruta final del motor.
