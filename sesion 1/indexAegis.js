@@ -28,7 +28,15 @@ import{GananciasTotales,
        PrimeraVenta,
        ClientesDuplicados,
        FuncionSinProposito, 
-       totalVenta1Cicle
+       totalVenta1Cicle, 
+       ClientesRecurrentesWhitset, 
+       VentasPorCleinte, 
+       ComboRegalo, 
+       ProductoEstrellaXciudad, 
+       FirtCliOrd, 
+       mejorSemanaBruta, 
+       mejorSemana, 
+       parMasCercano
 } from "./cafe-origen-analitica1/Analitica.js" 
 
 import{ 
@@ -85,7 +93,21 @@ while(true){
 
         .16 venta x ciudad cadena 
 
-        .17 totalVentas 1 ciudad
+        .17 totalVentas 1 ciudad 
+
+        .18 Clientes registrados 
+
+        .19 Ventas por cliente 
+
+        .20 Combo regalio 
+
+        .21 Producto estrella de cada ciudad 
+
+        .22 Primer cliente seugn historial 
+
+        .23 Semana Con mayor gancia bruta  
+
+        .24 Presupuesto maximo
 
         .0 Salir del Motor
         `)
@@ -95,7 +117,7 @@ while(true){
 
         varAgis= Number(prompts("ingrese numero de opcion deseado ")) 
 
-        if(varAgis <0 || !Number.isInteger(varAgis) || varAgis>17){ 
+        if(varAgis <0 || !Number.isInteger(varAgis) || varAgis>24){ 
             console.log("dato invalido opcion no exite")
             continue
         } 
@@ -280,12 +302,69 @@ while(true){
     else if(varAgis == 17){ 
         totalVenta1Cicle()
         continue
-    }
+    } 
+
+    else if(varAgis == 18){ 
+        ClientesRecurrentesWhitset()
+        continue
+    } 
+
+    else if(varAgis == 19){ 
+        VentasPorCleinte()
+        continue
+    } 
+
+    else if(varAgis == 20){ 
+        ComboRegalo()
+        continue
+    } 
+
+    else if(varAgis == 21){ 
+        ProductoEstrellaXciudad()
+        continue
+    } 
+
+    else if(varAgis == 22){ 
+        FirtCliOrd()
+        continue
+    } 
+
+    else if(varAgis == 23){   
+
+        let yaropci 
+
+        while(true){ 
+            yaropci= Number(prompts("Numero de Opcion deseada /1.Mejor semana BruteForce /2. Mejor Semana Ventan deslisante/ ")) 
+
+            if(yaropci !== 1 && yaropci !== 2){ 
+                console.log("opcion invalida o inexistente") 
+                continue
+            } 
+
+            break
+        } 
+
+        if(yaropci == 1){ 
+            mejorSemanaBruta()
+        } 
+        else if(yaropci == 2){ 
+            mejorSemana()
+        }
+        continue
+    } 
+
+    else if(varAgis == 24){ 
+        parMasCercano()
+        continue
+    } 
     
     else if(varAgis == 0){
         console.log("salio del programa")
         break
-    }
+    } 
+
+
+
 
 
 }

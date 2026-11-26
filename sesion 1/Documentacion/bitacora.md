@@ -620,3 +620,182 @@ legibilidad: expresa claramente conversión, filtrado y reducción, y demuestra
 cómo varios recorridos constantes siguen siendo lineales. El criterio de
 decisión no cambia código en esta redacción: no se realiza el cambio hasta
 confirmar la ruta final del motor.
+
+## Opción 19: tabla vacía en ventas por cliente
+
+Se comprobó la secuencia ejecutando primero la opción 18, **Clientes
+registrados**, y luego la opción 19, **Ventas por cliente**. La opción 19
+imprimió correctamente estos resultados:
+
+| Cliente | Ventas asociadas | Monto comprado |
+|---|---:|---:|
+| C01 | 3 | 179.000 |
+| C02 | 2 | 146.000 |
+| C03 | 2 | 140.000 |
+| C04 | 1 | 45.000 |
+| C05 | 1 | 26.000 |
+| C06 | 1 | 42.000 |
+| C07 | 1 | 42.000 |
+| C08 | 1 | 26.000 |
+
+La función `VentasPorCleinte()` recorre el conjunto global `ClientesDall` para
+crear una fila por cada ID. La opción 18 llama a `ClientesRecurrentesWhitset()`,
+que recorre `Db_ventas` y agrega los IDs al conjunto con
+`ClientesDall.add(...)`. Por eso la opción 19 encuentra los clientes cuando se
+ejecuta después de la opción 18.
+
+La tabla vacía con solo encabezados ocurriría si se inicia un proceso nuevo y se
+elige directamente la opción 19, sin ejecutar antes la opción 18: `ClientesDall`
+empieza vacío, el ciclo no procesa IDs y el arreglo entregado a `console.table`
+queda vacío. Si se reinicia el proceso de Node.js, el conjunto vuelve a su
+estado inicial y la opción 18 debe ejecutarse de nuevo. La dependencia es de
+orden entre las opciones, no un fallo de `console.table`. No se cambió el código
+del motor.
+
+## Comparación de `mejorSemanaBruta` y `mejorSemana`
+
+Ambas funciones buscan el bloque de siete días consecutivos con mayor suma de
+ganancias brutas (`montoVenta`). La primera vuelve a sumar los siete días desde
+cero para cada posición. La segunda calcula la primera suma y, al avanzar,
+resta el valor que sale de la ventana y suma el que entra.
+
+### Traza de las tres primeras posiciones
+
+Para ilustrar el movimiento con datos reproducibles, se usaron los primeros
+nueve valores del arreglo pseudoaleatorio generado para la prueba de 100.000
+días:
+
+```text
+días: [9712, 4609, 5377, 8562, 5987, 820, 7548, 37, 1014, ...]
+k = 7
+```
+
+```text
+Posición 1 (días 1–7): [9712, 4609, 5377, 8562, 5987, 820, 7548]
+Total = 42.615
+
+Posición 2 (días 2–8):       [4609, 5377, 8562, 5987, 820, 7548, 37]
+Total = 42.615 - 9712 + 37 = 32.940
+        sale 9712; entra 37
+
+Posición 3 (días 3–9):              [5377, 8562, 5987, 820, 7548, 37, 1014]
+Total = 32.940 - 4609 + 1014 = 29.345
+        sale 4609; entra 1014
+```
+
+La fuerza bruta obtiene cada total recorriendo nuevamente los siete elementos.
+La ventana deslizante conserva la suma anterior y solo actualiza los dos
+elementos que cambian.
+
+### Comprobación con las ventas de septiembre
+
+Se agruparon las ventas precargadas de `Db_ventas` por fecha y se completó el
+día sin registros con $0, según la decisión documentada para esta prueba:
+
+| Fecha | Ganancia bruta del día |
+|---|---:|
+| 2026-09-01 | $110.000 |
+| 2026-09-02 | $137.000 |
+| 2026-09-03 | $187.000 |
+| 2026-09-04 | $204.000 |
+| 2026-09-05 | $258.000 |
+| 2026-09-06 | $173.000 |
+| 2026-09-07 | $0 |
+
+El arreglo tiene exactamente siete días, así que hay una ventana posible. Las
+dos versiones devolvieron el mismo inicio (posición 1, 2026-09-01) y el mismo
+total: **$1.069.000**. La preparación de los totales diarios se hizo antes de
+comparar los algoritmos de ventana.
+
+### Comprobación con 100.000 días pseudoaleatorios
+
+Se generaron 100.000 valores enteros entre 0 y 10.000 con un generador
+pseudoaleatorio reproducible (semilla `0xC0FFEE`), usando `k = 7`. Ambas
+versiones encontraron el mismo resultado: total máximo **64.724**, con inicio
+en el índice 67.767 (día 67.768 contando desde 1). Por lo tanto, coincidieron
+tanto en el total como en la posición inicial.
+
+### Comparación de tiempos
+
+Medición aislada en Node.js 22.18.0. Se comparó únicamente el cálculo de las
+ventanas, con los mismos datos ya generados y cinco ejecuciones de calentamiento.
+Se tomaron 15 muestras de 10 ejecuciones por algoritmo y se reporta la mediana
+por ejecución; la generación aleatoria y la agrupación de ventas no forman parte
+de estos tiempos.
+
+| Datos | Fuerza bruta | Ventana deslizante | Relación |
+|---|---:|---:|---:|
+| 100.000 días, `k = 7` | 2,029 ms | 0,458 ms | Deslizante ≈ 4,43 veces más rápida |
+
+Con `n` días y tamaño `k`, la fuerza bruta realiza O((n − k + 1) × k), que se
+expresa como O(nk). La ventana deslizante suma una primera ventana y luego hace
+una suma y una resta por posición: su tiempo es O(n), con O(1) espacio auxiliar
+para el cálculo. Los tiempos son de una medición local y pueden variar entre
+ejecuciones, pero ambas versiones produjeron el mismo resultado.
+
+## Actualización de precios en las ventas precargadas
+
+Se compararon los `PrecioXunidad` de los objetos precargados de `Db_ventas` con
+el valor vigente de cada producto en el `Map` `productos`. Para los tres cafés,
+los precios actuales del catálogo son:
+
+| Producto | Precio vigente |
+|---|---:|
+| Origen Huila 500 g | $42.000 |
+| Origen Nariño 250 g | $26.000 |
+| Origen Sierra 500 g | $45.000 |
+
+Se actualizaron únicamente los campos `PrecioXunidad` y `montoVenta` en los
+registros cuyo precio unitario no coincidía. Para calcular el nuevo monto se
+conservó la cantidad original y se aplicó:
+
+```text
+montoVenta = PrecioXunidad × Cantidad
+```
+
+| Clave de venta | Producto | Cantidad | Precio anterior → vigente | Monto anterior → recalculado |
+|---:|---|---:|---:|---:|
+| 1 | Origen Huila 500 g | 2 | $18.000 → $42.000 | $42.000 → $84.000 |
+| 4 | Origen Huila 500 g | 1 | $18.000 → $42.000 | $42.000 → $42.000 |
+| 5 | Origen Sierra 500 g | 3 | $18.000 → $45.000 | $45.000 → $135.000 |
+| 6 | Origen Nariño 250 g | 2 | $13.000 → $26.000 | $26.000 → $52.000 |
+| 8 | Origen Huila 500 g | 2 | $18.000 → $42.000 | $42.000 → $84.000 |
+| 9 | Origen Sierra 500 g | 2 | $18.000 → $45.000 | $45.000 → $90.000 |
+| 10 | Origen Huila 500 g | 4 | $18.000 → $42.000 | $42.000 → $168.000 |
+| 12 | Origen Nariño 250 g | 3 | $13.000 → $26.000 | $26.000 → $78.000 |
+
+Los registros 2, 3, 7 y 11 no requirieron cambios: sus precios unitarios ya
+coincidían con el valor de su producto en el catálogo. Se conservaron las doce
+ventas, sus claves, productos, cantidades y demás propiedades; no se añadieron
+ni eliminaron objetos.
+
+El cambio aumenta el total de las ventas precargadas en $416.000: $216.000
+corresponden a Huila, $65.000 a Nariño y $135.000 a Sierra. Así, el total de
+`montoVenta` pasa de $1.069.000 a **$1.485.000**. Este ajuste hace coherentes los
+montos históricos precargados con los precios vigentes del catálogo; los totales
+de reportes anteriores a la actualización reflejan los valores antiguos.
+
+## Evidencia de reporte y rendimiento
+
+Se revisó la transcripción de consola `Pruebas ultima.txt`. En ella se eligió
+la generación automática de 10.000 ventas; como las 12 ventas precargadas no se
+reemplazan, el reporte posterior procesó **10.012 ventas**. La salida contiene
+una medición `Filter: 3.099s`, correspondiente al `console.time` interno de
+`ClientesRecurrentesWhitset()`. No es el tiempo total de `ReportSol()`.
+
+La transcripción muestra una primera ejecución del reporte interrumpida por
+`ReferenceError: sortingForreport is not defined` y una ejecución posterior que
+sí continuó. No se usó la ejecución interrumpida como medición de rendimiento.
+El registro no contiene un cronómetro total del reporte, tiempos identificados
+como versiones v0.1 y v1.0, ni una ejecución con 100.000 ventas. Por esa razón
+no se atribuyen valores de rendimiento a esos casos. La medición disponible y
+las complejidades de las funciones actuales se documentan en
+`RENDIMIENTO.md`.
+
+El requisito propone una ejecución por argumento, por ejemplo
+`node src/reporte.js 100000`, pero el proyecto actual solo expone el menú
+interactivo de `indexAegis.js`; no existe ese archivo o modo CLI en la
+estructura revisada. Tampoco se registró una comparación reproducible entre
+v0.1 y v1.0. Estas limitaciones quedan señaladas para no presentar como
+completadas funciones o pruebas que no aparecen en el código ni en la
+transcripción disponible.

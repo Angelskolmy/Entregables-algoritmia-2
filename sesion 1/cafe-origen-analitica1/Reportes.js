@@ -14,17 +14,31 @@ import{
     Alllist
 } from "./Explorar.js" 
 
-import{GananciasTotales, 
-       TotalItemsBendidos, 
-       MayorVenta, 
-       PrecioPromedioVenta, 
-       TotalVentasXciudad, 
-       MapGananciasTotales, 
-       MapTotalItemsBendidos, 
-       MaPTotalVentasXciudad, 
-       unidadesPorProducto, 
-       sortlog, 
-       sortingForreport
+import{
+    GananciasTotales, 
+    TotalItemsBendidos, 
+    MayorVenta, 
+    PrecioPromedioVenta, 
+    TotalVentasXciudad, 
+    MapGananciasTotales, 
+    MapTotalItemsBendidos, 
+    MaPTotalVentasXciudad, 
+    unidadesPorProducto, 
+    sortlog,
+    OrderFecha,
+    PrimeraVenta,
+    ClientesDuplicados,
+    FuncionSinProposito, 
+    totalVenta1Cicle, 
+    ClientesRecurrentesWhitset, 
+    VentasPorCleinte, 
+    ComboRegalo, 
+    ProductoEstrellaXciudad, 
+    FirtCliOrd, 
+    mejorSemanaBruta, 
+    mejorSemana, 
+    parMasCercano,
+    sortingForreport,
 } from "./Analitica.js" 
 
 import{ 
@@ -71,5 +85,32 @@ export function ReportSol(){
     sortingForreport()
 
     console.log("----------------------------------------------------------------------------------------------") 
+
+    console.log("--------------clientes recurrentes------------------------------------------------------------") 
+
+    ClientesRecurrentesWhitset() 
+
+    console.log("----------------------------------------------------------------------------------------------")
+
+
+    console.log("--------------Productos Estrella por Ciudad---------------------------------------------------")
+
+    ProductoEstrellaXciudad()
+
+    console.log("----------------------------------------------------------------------------------------------")
+
+
+    console.log("--------------Productos Estrella por Ciudad---------------------------------------------------")
+
+    ComboRegalo() 
+
+    console.log("----------------------------------------------------------------------------------------------")  
+
+
+    console.log("--------------Mejor ganacia por semana--------------------------------------------------------")
+
+    mejorSemana() 
+
+    console.log("----------------------------------------------------------------------------------------------")  
 
 }

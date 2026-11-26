@@ -6,25 +6,36 @@ export let productos = new Map([
 
   ["HU01", { 
     nombre: "Origen Huila 500 g",   
-    valor: 18000 }],
+    valor: 42000 }],
 
   ["NA02", { 
     nombre: "Origen Nariño 250 g",  
-    valor: 13000 }],
+    valor: 26000 }],
 
   ["SI03", { 
     nombre: "Origen Sierra 500 g",  
-    valor: 18000 }],
+    valor: 45000 }],
 
   ["PF04", { 
     nombre: "Prensa francesa",      
     valor: 95000 }],
 
   ["MM05", { nombre: "Molino manual",        
-    valor: 120000 }]
+    valor: 120000 }],
+
+  ["ER67", { nombre: "Origen Huila 1 kg", 
+    valor:79000}],
+
+  ["MH98", { nombre: "Filtros de papel x100", 
+    valor: 18000}], 
+
+  ["KO67", { nombre: "Taza de cerámica", 
+    valor:35000}],
 ]); 
 
-export let Ciudades_Coverturas= ['Medellín','Bogotá','Cali','Pereira'] 
+export let Ciudades_Coverturas= ['Medellín','Bogotá','Cali','Pereira']  
+
+export let ClientesDall = new Set()
 
 export let Db_ventas= new Map([
 
@@ -33,8 +44,8 @@ export let Db_ventas= new Map([
        Producto:"Origen Huila 500 g", 
        Ciudad:"Medellín", 
        Cantidad:2, 
-       montoVenta:42000, 
-       PrecioXunidad:18000 
+       montoVenta:84000,
+       PrecioXunidad:42000
     }],
 
 
@@ -62,7 +73,7 @@ export let Db_ventas= new Map([
         Ciudad:"Medellín", 
         Cantidad:1, 
         montoVenta:42000, 
-        PrecioXunidad:18000
+        PrecioXunidad:42000
 
     }],
     
@@ -71,8 +82,8 @@ export let Db_ventas= new Map([
         Producto:"Origen Sierra 500 g", 
         Ciudad:"Medellín", 
         Cantidad:3 , 
-        montoVenta:45000, 
-        PrecioXunidad:18000
+        montoVenta:135000,
+        PrecioXunidad:45000
 
     }],
     
@@ -81,8 +92,8 @@ export let Db_ventas= new Map([
         Producto:"Origen Nariño 250 g", 
         Ciudad:"Bogotá", 
         Cantidad:2, 
-        montoVenta:26000 , 
-        PrecioXunidad:13000
+        montoVenta:52000,
+        PrecioXunidad:26000
 
     }],
     
@@ -101,8 +112,8 @@ export let Db_ventas= new Map([
         Producto:"Origen Huila 500 g", 
         Ciudad:"Cali", 
         Cantidad:2, 
-        montoVenta:42000, 
-        PrecioXunidad:18000
+        montoVenta:84000,
+        PrecioXunidad:42000
 
     }],
     
@@ -111,8 +122,8 @@ export let Db_ventas= new Map([
         Producto:"Origen Sierra 500 g", 
         Ciudad:"Cali", 
         Cantidad:2, 
-        montoVenta:45000, 
-        PrecioXunidad:18000
+        montoVenta:90000,
+        PrecioXunidad:45000
 
     }],
     
@@ -121,8 +132,8 @@ export let Db_ventas= new Map([
         Producto:"Origen Huila 500 g", 
         Ciudad:"Pereira", 
         Cantidad:4, 
-        montoVenta:42000, 
-        PrecioXunidad:18000
+        montoVenta:168000,
+        PrecioXunidad:42000
 
     }],
     
@@ -141,8 +152,8 @@ export let Db_ventas= new Map([
         Producto:"Origen Nariño 250 g", 
         Ciudad:"Bogotá", 
         Cantidad:3, 
-        montoVenta:26000, 
-        PrecioXunidad:13000
+        montoVenta:78000,
+        PrecioXunidad:26000
 
     }]
 
@@ -403,3 +414,4 @@ export function Ingreso_Automatico(){
     }
 
 }
+
